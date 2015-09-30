@@ -1,0 +1,58 @@
+body {
+  padding-top:51px; // Source - http://getbootstrap.com/components/#callout-navbar-fixed-top-padding
+}
+
+[ui-sref] {
+  cursor: pointer;
+}
+
+*:focus {
+  outline:none !important;
+}
+
+button {
+  transition:all 200ms ease-in-out;
+}
+
+//Typography
+body {
+  font-family:@body-font;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family:@header-font;
+}
+
+
+//angularjs form validation
+.ng-dirty.ng-valid {
+  .form-control-validation-angular(@state-success-text; @state-success-text; @state-success-bg);
+}
+
+.ng-invalid {
+  .form-control-validation-angular(@state-danger-text; @state-danger-text; @state-danger-bg);
+}
+
+.table {
+  // Cells
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.chip-1 {
+  background-color: @chip1;
+}
+.chip-2 {
+  background-color: @chip2;
+}
+.chip-3 {
+  background-color: @chip3;
+}

@@ -1,0 +1,118 @@
+<div id="ConsoleContainer">
+	<aside id="ConsoleMenu">
+		<div class="list-group console-menu">
+			<button type="button" class="list-group-item"
+					ng-class="{active:console.SelectedResource == resource}"
+					ng-repeat="resource in console.Resources" ng-click="console.SelectResource(this)">{{resource.name}} <!--<span class="badge">{{resource.methods.length}}</span>--></button>
+		</div>
+	</aside>
+	<article class="container-fluid" ng-hide="console.SelectedResource">
+		<h3 class="page-header"><i class="fa fa-tools"></i>API Console</h3>
+		<p>Welcome to the OrderCloud API Console!  The purpose of this tool is to give developers an idea of how the OrderCloud RESTful API is structured through an interactive UI.</p>
+		<p>Begin by choosing a resource from the left and then specify an endpoint in the drop-down.  If the selected endpoint has parameters available, fill these out by clicking "params" to the right of the endpoint.  When creating and updating you will often need to provide a request body as well.  These request bodies will always be in <code>JSON</code> format and is editable below the endpoint selector.</p>
+		<p class="alert alert-danger">Keep in mind that <b>this <em>will</em> alter your database</b>, and changes will be immediately reflected in any application using your distributor companies' client id.</p>
+	</article>
+	<div id="Console" ng-show="console.SelectedResource">
+		<article id="Request">
+			<h3 class="page-title">
+				{{console.SelectedResource.name}}
+				<small ng-bind="console.SelectedEndpoint.Name"></small>
+			</h3>
+			<!--		<p ng-bind-html="comment | markdown" ng-repeat="comment in console.SelectedResource.Documentation.Comments"></p>
+					<p ng-bind-html="comment | markdown" ng-repeat="comment in console.SelectedEndpoint.Comments"></p>-->
+			<section class="console-selector">
+				<span dropdown>
+				  <a href dropdown-toggle>
+					  {{console.SelectedMethod.name || 'Method'}} <span class="caret"></span>
+				  </a>
+				  <ul class="dropdown-menu">
+					  <li ng-repeat="method in console.SelectedResource.methods" ng-class="{active:console.SelectedMethod.name == method.name}">
+						  <a href ng-click="console.SelectMethod(this)">{{method.name}}</a>
+					  </li>
+				  </ul>
+				</span>
+					<pre>{{console.SelectedEndpoint.UriTemplate}}</pre>
+				<!--<span class="btn btn-link" ng-if="console.SelectedEndpoint && console.SelectedEndpoint.Parameters.length" ng-click="console.SelectedEndpoint.showParams = !console.SelectedEndpoint.showParams">
+					Params
+				</span>-->
+				<button class="btn btn-primary" ng-click="console.Execute()" ng-disabled="!console.SelectedMethod">Send <i class="fa fa-send-o"></i></button>
+			</section>
+			<section id="Configuration" ng-show="console.SelectedEndpoint">
+				<div ng-if="console.SelectedEndpoint.Parameters.length">
+					<table class="table">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Type</th>
+							<th>Value</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="param in console.SelectedEndpoint.Parameters"> <!--ng-class="{'danger':(param.Required && !console.SelectedMethod.resolvedParameters[$index].Value)}"-->
+							<td>{{param.Name}} <small class="text-muted" ng-if="!param.Required">(optional)</small></td>
+							<td><div class="label" ng-class="{
+									'label-primary': param.Type == 'string',
+									'label-warning': param.Type == 'boolean',
+									'label-info': param.Type == 'integer'
+								}">{{param.Type}}</div></td>
+							<td>
+								<div ng-class="{'input-group': console.SelectedMethod.resolvedParameters[$index].Lockable}">
+									<input type="{{param.Type == 'integer' ? 'number' : 'text'}}" class="form-control"
+										   tooltip="{{param.Description}}"
+										   tooltip-trigger="focus"
+										   ng-model="console.SelectedMethod.resolvedParameters[$index].Value" ng-required="param.Required" ng-disabled="console.isLocked(param.Name)"/>
+									<span class="input-group-btn" ng-if="console.SelectedMethod.resolvedParameters[$index].Lockable">
+										<button class="btn btn-default" ng-click="console.isLocked(param.Name) ? console.unlockParam(param.Name) : console.lockParam(param.Name, console.SelectedMethod.resolvedParameters[$index].Value)" ng-disabled="!console.SelectedMethod.resolvedParameters[$index].Value" tooltip="{{console.isLocked(param.Name) ? 'Unlock Value' : 'Lock Value'}}" tooltip-append-to-body="true">
+											<i class="fa" ng-class="{'fa-lock': console.isLocked(param.Name), 'fa-unlock-alt': !console.isLocked(param.Name)}"></i>
+										</button>
+									</span>
+								</div>
+
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+				<div ng-repeat="parameter in console.SelectedMethod.resolvedParameters | objectParams">
+					<p class="" class="page-header">
+						{{'Request Body: ' + parameter.Name + ' object'}}
+					</p>
+					<div ui-ace="{
+						onLoad: console.setMaxLines,
+						useWrapMode : true,
+						theme:'twilight',
+						mode: 'json',
+						tabSize: '4',
+						useSoftTabs: true,
+						showPrintMargin: false
+					}" ng-model="parameter.Value">
+					</div>
+				</div>
+											<!--<pre>{{console.SelectedResource.name + '.' + console.SelectedMethod.name + '('}}<span ng-repeat="p in console.SelectedMethod.resolvedParameters">{{((p.Value != null && p.Value != '') ? (p.Type == 'text' ? ('\'' + p.Value + '\'') : p.Value) : p.Name) + (!$last ? ', ' : ')') }}</span></pre>-->
+			</section>
+
+		</article>
+		<div id="Response">
+			<div id="ResponseList">
+				<div class="log-item-container" ng-repeat="response in console.Responses | orderBy:'+':true">
+					<div class="log-item">
+						<div class="apiRequestDisplay" ng-class="{success: (response.status < 300 && response.status >= 200), danger: (response.status >= 300 || response.status < 200), disabled: response != console.SelectedResponse}" ng-click="console.SelectResponse(response)">
+							<pre>{{response.config.method}}</pre>
+							<pre><i class="fa pull-right" ng-class="{'fa-check':(response.status < 300 && response.status >= 200), 'fa-warning': (response.status >= 300 || response.status < 200)}"></i>{{(response.config.url | OCRoutingUrl) + (response.config.params | OCUrlParams)}} <small>{{response.status + ' ' + response.statusText}}</small></pre>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="ResponseBody" readonly ui-ace="{
+				useWrapMode : true,
+				theme:'twilight',
+				mode: 'json',
+				tabSize: '4',
+				useSoftTabs: true,
+				showPrintMargin: false,
+				showGutter: false
+			}" ng-model="console.SelectedResponse.data"></div>
+		</div>
+	</div>
+</div>
+

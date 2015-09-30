@@ -1,0 +1,143 @@
+#ConsoleContainer {
+  display:flex;
+  flex-flow:row nowrap;
+  overflow:hidden;
+}
+#ConsoleMenu,
+#Console {
+  max-height:~'calc(100vh - 51px)';
+  overflow-y:auto;
+}
+#ConsoleMenu {
+  flex: 0 1 auto;
+  min-width:200px;
+  border-right:1px solid @list-group-border;
+  .list-group {
+    margin:0;
+  }
+  .list-group-item {
+    padding-top:15px;
+    padding-bottom:15px;
+    border-radius:0;
+    border-right:none;
+    border-left:none;
+    &:first-child {
+      border-top:none;
+    }
+    &:last-child {
+      border-bottom:none;
+    }
+  }
+}
+
+#Console {
+  flex:1 0 auto;
+  display:flex;
+  flex-flow:row nowrap;
+}
+
+#Request,
+#Response {
+  flex:1;
+}
+
+#Request {
+  max-width:1000px;
+  padding:@padding-base-vertical @padding-base-horizontal;
+  .body-title {
+    color:white;
+    background-color:@gray;
+    margin:@padding-base-vertical 0 0;
+    padding:@padding-base-vertical @padding-base-horizontal;
+    .border-top-radius(4px);
+  }
+  .ace_editor {
+    border-radius: 0 0 @border-radius-base @border-radius-base;
+  }
+}
+
+#Response {
+  display:flex;
+  flex-flow:column nowrap;
+}
+
+#ResponseList {
+  min-height:56px;
+  flex:0 1 auto;
+  max-height:200px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  background-color:#141414;
+  padding:@padding-base-vertical @padding-base-horizontal;
+  .apiRequestDisplay {
+    cursor: pointer;
+    pre {
+      transition: all 200ms;
+      margin-top:@padding-base-vertical;
+      margin-bottom:0;
+      border:0;
+    }
+  }
+}
+
+.log-item-container {
+  perspective:1000px;
+  transition:height 400ms, opacity 300ms ease-out 100ms;
+  .log-item {
+    transition: transform 500ms;
+    transform-style:preserve-3d;
+    transform-origin:center bottom 0;
+    height:44px;
+    position:relative;
+  }
+  &.ng-enter {
+    height:0;
+    opacity:0;
+    .log-item {
+      transform:rotateX(90deg);
+    }
+  }
+  &.ng-enter-active {
+    height:44px;
+    opacity:1;
+    .log-item {
+      transform:rotateX(0deg);
+    }
+  }
+}
+
+#ResponseBody {
+  flex:1 0 auto;
+}
+
+.console-selector {
+  background-color:@gray-lighter;
+  display:flex;
+  flex-flow:row nowrap;
+  border-radius:@border-radius-base;
+  & > span {
+	padding:@padding-base-vertical*2 @padding-base-horizontal;
+  }
+  pre {
+    flex:1;
+    padding:0 @padding-base-horizontal;
+    margin:@padding-base-vertical*2 0;
+    border-radius:0;
+    background-color:transparent;
+    border:none;
+    border-left:1px solid darken(@gray-lighter, 15);
+  }
+  button {
+    font-weight:bold;
+    float:right;
+    border:none;
+    .border-left-radius(0);
+  }
+  .dropdown-menu {
+    background-color:@gray-lighter;
+    border:none;
+    top:90%;
+    box-shadow:none;
+    border-radius:0 0 4px 4px;
+  }
+}

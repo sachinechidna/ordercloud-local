@@ -1,0 +1,17 @@
+<div ng-if="application.$state.is('base.course')">
+	<header class="jumbotron">
+		<div class="container">
+			<h2>{{course.current.Name}}</h2>
+		</div>
+	</header>
+	<article class="container">
+		<h3></h3>
+		<div class="list-group">
+			<a class="list-group-item" ng-repeat="class in course.classes" ui-sref=".class({classid:class.ID})">
+				<h4 class="list-group-item-heading">{{class.Name}}</h4>
+				<p class="list-group-item-text">{{class.Description}}</p>
+			</a>
+		</div>
+	</article>
+</div>
+<ui-view autoscroll="true"></ui-view>

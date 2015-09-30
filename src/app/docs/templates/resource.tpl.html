@@ -1,0 +1,61 @@
+<h3 class="page-title">{{docsResource.current.Name}}</h3>
+<accordion>
+	<accordion-group heading="{{endpoint.Name}}" ng-repeat="endpoint in docsResource.current.Endpoints">
+		<pre><b ng-bind="endpoint.HttpVerb"></b> {{endpoint.UriTemplate}}</pre>
+		<div ng-if="endpoint.Parameters.length">
+			<h6>Parameters:</h6>
+			<table class="table table-bordered table-striped">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Required</th>
+					<th>Description</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="param in endpoint.Parameters">
+					<td>{{param.Name}} <small class="text-muted" ng-if="!param.Required">(optional)</small></td>
+					<td><div class="label" ng-class="{
+									'label-primary': param.Type == 'string',
+									'label-warning': param.Type == 'boolean',
+									'label-info': param.Type == 'integer'
+								}">{{param.Type}}</div></td>
+					<td>{{param.Required}}</td>
+					<td>{{param.Description}}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<div ng-if="endpoint.RequestBody.Sample && endpoint.RequestBody.Sample != 'null'">
+					<h5>Request Body Sample:</h5>
+					<!--<div hljs source="endpoint.RequestBody.Sample" language="json"></div>-->
+					<div  readonly ui-ace="{
+									onLoad: docsResource.setMaxLines,
+									useWrapMode : true,
+									theme:'twilight',
+									mode: 'json',
+									tabSize: '4',
+									useSoftTabs: true,
+									showPrintMargin: false
+								}" ng-model="endpoint.RequestBody.Sample"></div>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<h5><b>Response Status: <span class="text-danger">{{endpoint.ResponseStatus}}</span></b></h5>
+				<!--<div ng-if="endpoint.ResponseBody.Sample && endpoint.ResponseBody.Sample != 'null'" hljs source="endpoint.ResponseBody.Sample" language="json"></div>-->
+				<div ng-if="endpoint.ResponseBody.Sample && endpoint.ResponseBody.Sample != 'null'" readonly ui-ace="{
+															onLoad: docsResource.setMaxLines,
+															useWrapMode : true,
+															theme:'twilight',
+															mode: 'json',
+															tabSize: '4',
+															useSoftTabs: true,
+															showPrintMargin: false
+														}" ng-model="endpoint.ResponseBody.Sample"></div>
+			</div>
+		</div>
+	</accordion-group>
+</accordion>

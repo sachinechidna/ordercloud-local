@@ -1,0 +1,103 @@
+<div id="Class" ng-class="{'interactive':class.current.Interactive}">
+	<nav class="navbar navbar-inverse navbar-fixed-bottom">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand">{{course.current.Name + ' / ' + class.current.Name}}</a>
+			</div>
+			<div ng-hide="true" class="nav navbar-nav navbar-right dropup" id="ContextMenu" dropdown auto-close="outsideClick">
+				<a href dropdown-toggle><i class="fa fa-user"></i></a>
+				<div class="dropdown-menu dropup context-content" aria-labelledby="context-btn">
+					<i class="fa fa-group"></i>
+					<div class="context-title">
+						App Context Definition
+					</div>
+					<form>
+						<div class="form-group">
+							<input type="text" class="form-control" placeholder="clientID" ng-model="class.context.clientID">
+						</div>
+						<div class="form-divider"></div>
+						<div class="form-group">
+							<input type="text" class="form-control" placeholder="Username" ng-model="class.context.username">
+						</div>
+						<div class="form-group">
+							<input type="password" class="form-control" placeholder="Password" ng-model="class.context.password">
+						</div>
+						<button type="submit" class="btn btn-info pull-right" ng-click="class.context.setContext()">Set Context</button>
+						<button class="btn btn-danger pull-left" ng-click="class.context.clearContext()">Clear Context</button>
+					</form>
+					<div class="context-knob"></div>
+				</div>
+			</div>
+			<ul ng-hide="true" class="nav navbar-nav navbar-right">
+				<li>
+					<a dropdown-toggle class="context-user" ng-class="{contextSet: class.context.User}">{{class.context.User ? 'Context User: ' + class.context.User.FirstName + ' ' + class.context.User.LastName : 'No Context User Set'}}</a>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li>
+					<a ng-hide="class.current.Interactive" href="" ng-click="class.nextClass()">Next Class</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<article id="ClassContainer" ng-class="{'interactive':!class.current.Interactive}">
+		<div id="CourseContent" ng-include="class.current.TemplateUrl"></div>
+		<div id="InteractiveUI" ng-if="class.current.Interactive">
+			<div id="ScriptInputContainer">
+				<div class="script-nav">
+					<span>
+						<ul class="nav nav-tabs">
+							<li role="presentation" ng-class="{'active': (script.Title == class.current.ActiveScript)}" ng-repeat="script in class.current.ScriptModels.Scripts | orderBy: 'ListOrder'"><a ng-click="class.activeScriptFn(script.Title)"><i class="fa fa-file-code-o"></i> {{script.Title}}</a></li>
+						</ul>
+					</span>
+					<button type="button" class="btn btn-primary" ng-click="class.Execute()">Run <i class="fa fa-play-circle-o"></i></button>
+				</div>
+				<div style="font-size: 1.1em" id="ScriptInput" class="code-block"
+					 ng-repeat="script in class.current.ScriptModels.Scripts" ng-class="{ActiveCodeBlock: script.Title == class.current.ActiveScript}"
+					 ui-ace="{
+				useWrapMode : true,
+				theme:'twilight',
+				mode: 'javascript',
+				tabSize: '4',
+				useSoftTabs: true,
+				showPrintMargin: false
+			}" ng-model="script.Model"></div>
+			</div>
+			<div id="Response">
+				<div class="response-content">
+					<accordion class="howto-log">
+						<accordion-group is-open="status.open" class="log-entry" ng-repeat="response in class.allResponses">
+							<accordion-heading class="row">
+								<div class="pull-right"><a href><i class="fa" ng-class="{'fa-chevron-down': !status.open, 'fa-chevron-up': status.open}"></i></a></div>
+								<span class="log-entry-header">{{response.config.method}}</span>
+								<span class="log-entry-header">{{response.config.url | OCRoutingUrl}}</span>
+								<span class="log-entry-header">{{response.status}} {{response.statusText}}</span>
+
+							</accordion-heading>
+							<tabset class=log-entry-content justified="true">
+								<tab heading="Headers">
+									<pre class="response-block"><code>{{response.config.headers | json}}</code></pre>
+								</tab>
+								<tab heading="Raw Response">
+									<pre class="raw-response"><code>{{response.data}}</code></pre>
+								</tab>
+								<tab heading="JSON" active="true">
+									<pre class="response-block"><code class="json-response">{{response.data | json}}</code></pre>
+								</tab>
+							</tabset>
+						</accordion-group>
+					</accordion>
+				</div>
+				<div class="alert alert-success response-alert" role="alert" ng-class="{slide: class.responseSuccess && class.allowNextOnSuccess}">
+					<a class="pull-right" href ng-click="class.nextClass()">GO TO NEXT CLASS</a> <span class="response-words">All Requests Succeeded. Great Job!</span><i class="fa fa-check pull-left"></i>
+				</div>
+				<div class="alert alert-danger response-alert" role="alert" ng-class="{slide: class.responseFailure}" >
+					<a class="pull-right" href><i class="fa fa-close" ng-click="class.responseFailure=false"></i></a> <span class="response-words">One or More Requests Failed.</span><i class="fa fa-warning pull-left"></i>
+				</div>
+				<div class="alert alert-info response-alert" role="alert" ng-class="{slide: class.responseSuccess && !class.allowNextOnSuccess}">
+					<a class="pull-right" href><i class="fa fa-close" ng-click="class.responseSuccess=false"></i></a> <span class="response-words">Request Successful. Please continue class as directed</span><i class="fa fa-check pull-left"></i>
+				</div>
+			</div>
+		</div>
+	</article>
+</div>
